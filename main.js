@@ -17,6 +17,9 @@ async function bootstrap() {
 
 	app.use(express.json());
 	app.use(express.urlencoded({ extended: true }));
+	
+	app.use(notFoundHandler);
+	app.use(errorHandler);
 
 	httpServer.listen(PORT, () => console.log(`server running on ${PORT}`));
 }
