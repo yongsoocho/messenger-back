@@ -2,6 +2,9 @@ import express from "express";
 import "dotenv/config";
 import { Server } from "socket.io";
 import { createServer } from "node:http";
+import { UserRouter } from "./src/routes/user.router.js";
+import { errorHandler, notFoundHandler } from "./src/handler/error.handler.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 const httpServer = createServer(app);
@@ -17,6 +20,12 @@ async function bootstrap() {
 
 	app.use(express.json());
 	app.use(express.urlencoded({ extended: true }));
+	app.use(cookieParser());
+
+	app.use("/user", UserRouter);
+
+	app.use(notFoundHandler);
+	app.use(errorHandler);
 
 	httpServer.listen(PORT, () => console.log(`server running on ${PORT}`));
 }

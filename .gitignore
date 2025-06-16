@@ -6,3 +6,6 @@ build
 
 .env
 *.pem
+/src/generated/prisma
+
+/src/generated/prisma
