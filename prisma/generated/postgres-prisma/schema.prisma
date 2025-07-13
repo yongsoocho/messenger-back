@@ -26,4 +26,25 @@ model User {
   password  String
   role      Role     @default(USER) // user, admin, etc.
   createdAt DateTime @default(now())
+
+  // 가상 컬럼
+  roomsToUser   Room[] @relation("ToUser")
+  roomsFromUser Room[] @relation("FromUser")
+}
+
+model Room {
+  id          String   @id @default(uuid()) @db.Uuid
+  createdAt   DateTime @default(now())
+  lastMessage String   @default("chat room created") @db.Text
+  updatedAt   DateTime @updatedAt
+
+  // FK
+  toUserId   String? @db.Uuid
+  fromUserId String  @db.Uuid
+
+  // Relations, 가상컬럼
+  toUser   User? @relation("ToUser", fields: [toUserId], references: [id], onDelete: SetNull)
+  fromUser User  @relation("FromUser", fields: [fromUserId], references: [id], onDelete: Cascade)
+
+  @@unique([toUserId, fromUserId]) // 유저간의 채팅방은 유일해야 함
 }
