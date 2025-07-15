@@ -4,7 +4,7 @@ import { Server } from "socket.io";
 import { createServer } from "node:http";
 import { UserRouter } from "./src/routes/user.router.js";
 import { RoomRouter } from "./src/routes/room.router.js";
-import { ChatRoom } from "./src/routes/chat.router.js";
+import { ChatRouter } from "./src/routes/chat.router.js";
 import { errorHandler, notFoundHandler } from "./src/handler/error.handler.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -51,10 +51,10 @@ async function bootstrap() {
 		RoomRouter,
 	);
 	app.use(
-		"/room",
+		"/chat",
 		authenMiddleware,
 		authorMiddleware(["USER", "ADMIN"]),
-		ChatRoom,
+		ChatRouter,
 	);
 
 	app.use(notFoundHandler);

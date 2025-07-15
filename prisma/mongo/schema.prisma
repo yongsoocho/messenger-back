@@ -13,3 +13,17 @@ datasource db {
   provider = "mongodb"
   url      = env("MONGO_URL")
 }
+
+enum TYPE {
+  TEXT
+  IMAGE
+}
+
+model Message {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  roomId    String
+  sender    String
+  content   String
+  type      TYPE     @default(TEXT)
+  createdAt DateTime @default(now())
+}

@@ -14,7 +14,7 @@ ChatRouter.get("/", async (req, res) => {
 	}
 
 	try {
-		const messages = await prisma.chatMessage.findMany({
+		const messages = await prisma.message.findMany({
 			where: { roomId },
 			orderBy: { createdAt: "asc" },
 		});
