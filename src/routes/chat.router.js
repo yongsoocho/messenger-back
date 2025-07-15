@@ -26,10 +26,10 @@ ChatRouter.get("/", async (req, res) => {
 });
 ChatRouter.post("/", async (req, res) => {
 	const io = req.app.get("io");
-	const { roomId, email, content } = req.body;
+	const { roomId, content } = req.body;
 
 	const msg = await prisma.message.create({
-		data: { roomId, sender: email, content },
+		data: { roomId, sender: req.user.email, content },
 	});
 
 	io.to(roomId).emit("message", msg);
@@ -38,12 +38,12 @@ ChatRouter.post("/", async (req, res) => {
 });
 ChatRouter.post("/image", upload.single("image"), async (req, res) => {
 	const io = req.app.get("io");
-	const { roomId, email } = req.body;
+	const { roomId } = req.body;
 
 	const content = `${url}/${req.file?.filename}`;
 
 	const msg = await prisma.message.create({
-		data: { roomId, sender: email, content, type: "IMAGE" },
+		data: { roomId, sender: req.user.email, content, type: "IMAGE" },
 	});
 
 	io.to(roomId).emit("message", msg);
