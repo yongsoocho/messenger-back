@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { PrismaClient } from "../../prisma/generated/mongo-prisma/index.js";
+import { PrismaClient } from "./../../prisma/generated/mongo-prisma/index.js";
 import { upload } from "./../middleware/multer.middleware.js";
 
 export const ChatRouter = Router();
@@ -13,39 +13,46 @@ ChatRouter.get("/", async (req, res) => {
 		return res.status(400).json({ error: "Room ID is required" });
 	}
 
-	try {
-		const messages = await prisma.message.findMany({
-			where: { roomId },
-			orderBy: { createdAt: "asc" },
-		});
-		return res.json(messages);
-	} catch (error) {
-		console.error("Error fetching chat messages:", error);
-		return res.status(500).json({ error: "Internal server error" });
-	}
+	const messages = await prisma.message.findMany({
+		where: { roomId },
+		orderBy: { createdAt: "asc" },
+	});
+
+	return res.json(messages);
 });
+
 ChatRouter.post("/", async (req, res) => {
 	const io = req.app.get("io");
+
 	const { roomId, content } = req.body;
 
 	const msg = await prisma.message.create({
-		data: { roomId, sender: req.user.email, content },
+		data: {
+			roomId,
+			content,
+			sender: req.user.email,
+		},
 	});
-
+	console.log(msg, roomId);
 	io.to(roomId).emit("message", msg);
-
 	return res.status(201).json(msg);
 });
-ChatRouter.post("/image", upload.single("image"), async (req, res) => {
+
+ChatRouter.post("/image", upload.single("chatimage"), async (req, res) => {
 	const io = req.app.get("io");
 	const { roomId } = req.body;
 
-	const content = `${url}/${req.file?.filename}`;
+	const content = `${url}/${req.file.filename}`;
 
 	const msg = await prisma.message.create({
-		data: { roomId, sender: req.user.email, content, type: "IMAGE" },
+		data: {
+			roomId,
+			content,
+			sender: req.user.email,
+			type: "IMAGE",
+		},
 	});
-
+	console.log("hi");
 	io.to(roomId).emit("message", msg);
 
 	return res.status(201).json(msg);
