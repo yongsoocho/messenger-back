@@ -19,22 +19,12 @@ export function authenMiddleware(req, res, next) {
 
 export function authorMiddleware(roles) {
 	return (req, res, next) => {
-		const token = req.cookies.token;
+		const user = req.user;
 
-		if (roles.includes(token.role)) {
+		if (!roles.includes(user.role)) {
 			return res.status(403).json({ message: "Forbidden" });
 		}
 
-		if (!token) {
-			return res.status(401).json({ message: "Unauthorized (author)" });
-		}
-
-		try {
-			const decoded = jwt.verify(token, process.env.JWT_SECRET);
-			req.user = decoded;
-			next();
-		} catch (error) {
-			return res.status(401).json({ message: "Invalid token 2" });
-		}
+		next();
 	};
 }
